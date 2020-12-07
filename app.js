@@ -2,6 +2,8 @@ const express = require('express');
 const bodyParser = require('body-parser');
 
 const userRoutes = require('./routes/user');
+const authRoutes = require('./routes/auth');
+
 const sequelize = require("./util/database");
 
 const User = require("./models/user");
@@ -24,7 +26,17 @@ app.use((req, res, next) => {
     next();
 })
 
-app.use('/user', userRoutes)
+app.use('/user', userRoutes);
+app.use("/auth", authRoutes);
+/** error handling */
+app.use((err, req, res, next) => {
+  console.log(err);
+  const status = err.statusCode || 500;
+  const message = err.message;
+  const errors = err.data || [];
+  res.status(status).json({ message, errors });
+});
+
 
 /** sync the tables with the db */
 sequelize
