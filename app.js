@@ -40,7 +40,7 @@ app.use((err, req, res, next) => {
 
 /** sync the tables with the db */
 sequelize
-  //.sync({force: true})
+  // .sync({force: true})
   .sync()
   .then((result) => {
     //console.log("sequelize result", result);
