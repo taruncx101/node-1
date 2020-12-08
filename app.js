@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require('express');
 const bodyParser = require('body-parser');
 
@@ -47,7 +48,7 @@ sequelize
   })
   .catch((err) => console.log('sequelize sync error',err));
 
-const server = app.listen(8080);
+const server = app.listen(process.env.PORT || 8080);
 //const io = require('socket.io')(server);
 const io = require("./socket").init(server);
 io.on("connection", (socket) => {
