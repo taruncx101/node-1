@@ -14,6 +14,7 @@ app.use(bodyParser.json()); // for parsing applcation/json data
 
 //set up cors policies
 app.use((req, res, next) => {
+  console.log('ccccc')
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader(
       "Access-Control-Allow-Methods",
@@ -47,4 +48,9 @@ sequelize
   })
   .catch((err) => console.log('sequelize sync error',err));
 
-app.listen(8080);
+const server = app.listen(8080);
+//const io = require('socket.io')(server);
+const io = require("./socket").init(server);
+io.on("connection", (socket) => {
+  console.log("client connected");
+});

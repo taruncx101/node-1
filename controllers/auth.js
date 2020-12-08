@@ -1,6 +1,9 @@
 const jwt = require("jsonwebtoken");
 const { validationResult } = require("express-validator");
 const bcrypt = require('bcryptjs')
+
+const io = require('../socket');
+
 const User = require('../models/user')
 
 const hash =12;
@@ -37,6 +40,7 @@ exports.signup = (req, res, next) => {
           privateKey,
           { expiresIn: "1h" }
         );
+        io.getIO().emit('user-added', {});
         res.status(201)
         .json({
           user,
@@ -90,6 +94,7 @@ exports.login = async  (req, res, next) => {
             delete newUserObj.password;
             newUserObj.token = token;
             console.log(delete loadedUser.password);
+            io.getIO().emit("user-added", {});
             res.status(200).json({ user: loadedUser, token, newUserObj });
         }
         catch(err) {
