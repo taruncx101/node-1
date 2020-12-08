@@ -7,8 +7,9 @@ exports.getUsers = async (req, res, next) => {
   const offset = limit*(currentPage - 1);
   try{
     const result = await User.findAndCountAll({
-        limit,
-        offset,
+      limit,
+      offset,
+      attributes: ["id", "name","email","createdAt"],
     });
     res.json(result);
   }
