@@ -29,8 +29,18 @@ exports.signup = (req, res, next) => {
         return user.save();
       })
       .then((user) => {
-        res.json({
+        const token = jwt.sign(
+          {
+            userId: user.id,
+            email: user.email,
+          },
+          privateKey,
+          { expiresIn: "1h" }
+        );
+        res.status(201)
+        .json({
           user,
+          token
         });
       })
       .catch((err) => {
