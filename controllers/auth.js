@@ -70,7 +70,7 @@ exports.login = async  (req, res, next) => {
             }
             const token = jwt.sign(
               {
-                id: loadedUser.id,
+                userId: loadedUser.id,
                 email: loadedUser.email,
               },
               privateKey,
