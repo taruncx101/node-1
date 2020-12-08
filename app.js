@@ -14,7 +14,6 @@ app.use(bodyParser.json()); // for parsing applcation/json data
 
 //set up cors policies
 app.use((req, res, next) => {
-  console.log('ccccc')
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader(
       "Access-Control-Allow-Methods",
