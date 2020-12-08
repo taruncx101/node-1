@@ -3,7 +3,7 @@ const User = require("../models/user");
 //using the async await
 exports.getUsers = async (req, res, next) => {
   const currentPage = req.query.page || 1;
-  const limit = 5;
+  const limit = 4;
   const offset = limit*(currentPage - 1);
   try{
     const result = await User.findAndCountAll({
