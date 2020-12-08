@@ -1,14 +1,23 @@
-exports.getUsers = (req, res, next) => {
-    res.status(200)
-        .json({
-        users: [
-            {
-                name: 'tarun',
-                email: 'tarun@gmail.com'
-            }
-        ],
-        total: 1
-    })
+const User = require("../models/user");
+
+//using the async await
+exports.getUsers = async (req, res, next) => {
+  const currentPage = req.query.page || 1;
+  const limit = 5;
+  const offset = limit*(currentPage - 1);
+  try{
+    const result = await User.findAndCountAll({
+        limit,
+        offset,
+    });
+    res.json(result);
+  }
+  catch(err) {
+    if (!err.statusCode) {
+        err.statusCode = 500;
+    }
+    next(err);
+  }
 }
 
 exports.createUser = (req, res, next) => {
