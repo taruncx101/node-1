@@ -111,6 +111,7 @@ exports.googleLogIn = async (req, res, next) => {
     const { data } = response;
     const { email } = data;
     const { name } = data;
+    /** this is for now only, we have to make password field nullable and we can also add some other field to track google login */
     const password = '12345';
     /** need to check the  user alreeady exist or not*/
     let user = await User.findOne({ where: { email } });
