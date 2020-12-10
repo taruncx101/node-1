@@ -9,7 +9,7 @@ const { body } = require("express-validator");
 const router = express.Router();
 
 router.post("/login", authController.login);
-router.get("/signup", authController.signup);
+router.get("/google-login", authController.googleLogIn);
 router.put(
   "/signup",
   [

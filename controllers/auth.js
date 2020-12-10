@@ -1,3 +1,4 @@
+const axios = require("axios");
 const jwt = require("jsonwebtoken");
 const { validationResult } = require("express-validator");
 const bcrypt = require('bcryptjs')
@@ -24,12 +25,11 @@ exports.signup = (req, res, next) => {
     bcrypt
       .hash(password, hash)
       .then((hashPw) => {
-        const user = new User({
+        return User.create({
           email,
           name,
           password: hashPw,
         });
-        return user.save();
       })
       .then((user) => {
         const token = jwt.sign(
@@ -58,17 +58,11 @@ exports.signup = (req, res, next) => {
 
 
 /** using the async await */
-/** I have some question here :) */
 exports.login = async  (req, res, next) => {
         const email = req.body.email;
         const password = req.body.password.toString() ;
         try{
             const loadedUser = await User.findOne({ where: { email} });
-            User.findOne({ where: { email } }).then(user => {
-                console.log('inside then block')
-                console.log(user)
-            });
-            console.log(loadedUser);
             if(!loadedUser) {
                 const error = new Error("User not found");
                 error.statusCode = 401;
@@ -90,12 +84,9 @@ exports.login = async  (req, res, next) => {
               privateKey,
               { expiresIn: "1h" }
             );
-            let newUserObj = {...loadedUser}
-            delete newUserObj.password;
-            newUserObj.token = token;
             console.log(delete loadedUser.password);
-            io.getIO().emit("user-added", {});
-            res.status(200).json({ user: loadedUser, token, newUserObj });
+            io.getIO().emit("user-logged-in", {});
+            res.status(200).json({ user: loadedUser, token });
         }
         catch(err) {
             if (!err.statusCode) {
@@ -104,4 +95,50 @@ exports.login = async  (req, res, next) => {
             next(err);
         }
 
+};
+
+exports.googleLogIn = async (req, res, next) => {
+  try {
+    const googleAuthToken = req.query.google_auth_token;
+    const url = `https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=${googleAuthToken}`;
+    const response = await axios.get(url);
+    if (response.status !== 200) {
+      const error = new Error("User not found");
+      error.statusCode = 401;
+      error.data = [];
+      throw error;
+    }
+    const { data } = response;
+    const { email } = data;
+    const { name } = data;
+    const password = '12345';
+    /** need to check the  user alreeady exist or not*/
+    let user = await User.findOne({ where: { email } });
+    let eventType = "user-logged-in";
+    if (!user) {
+      const hashPw = bcrypt.hashSync(password, hash);
+      user = await User.create({
+        email,
+        name,
+        password: hashPw,
+      });
+      eventType = "user-added";
+    }
+    console.log({ user });
+    const token = jwt.sign(
+      {
+        userId: user.id,
+        email: user.email,
+      },
+      privateKey,
+      { expiresIn: "1h" }
+    );
+    io.getIO().emit("eventType", {});
+    res.status(200).json({ user, token });
+  } catch (err) {
+    if (!err.statusCode) {
+      err.statusCode = 500;
+    }
+    next(err);
+  }
 };
